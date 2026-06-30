@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.database import get_db
 from app.models.user import User, UserRole
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse ,ChangePasswordRequest
 from app.schemas.token import Token
 from app.auth.security import verify_password, get_password_hash, create_access_token
 from app.auth.dependencies import get_current_active_user
@@ -55,3 +55,40 @@ def login(
 def get_current_user_info(current_user: User = Depends(get_current_active_user)):
     """Get current logged-in user info"""
     return current_user
+
+
+@router.put("/change-password")
+def change_password(
+    data: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    # Verify old password
+    if not verify_password(
+        data.old_password,
+        current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Old password is incorrect"
+        )
+
+    # Prevent same password
+    if verify_password(
+        data.new_password,
+        current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="New password cannot be same as old password"
+        )
+
+    current_user.hashed_password = get_password_hash(
+        data.new_password
+    )
+
+    db.commit()
+
+    return {
+        "message": "Password changed successfully"
+    }
