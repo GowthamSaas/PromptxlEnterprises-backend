@@ -4,7 +4,7 @@ from typing import List
 from app.database import get_db
 from app.models.tenant import Tenant
 from app.models.user import User
-from app.schemas.tenant import TenantCreate, TenantResponse
+from app.schemas.tenant import TenantBase, TenantCreate, TenantResponse
 from app.auth.dependencies import require_owner, require_superadmin
 from app.models.user import UserRole
 from app.auth.security import get_password_hash
@@ -54,6 +54,39 @@ def create_tenant(
     print(f"DEBUG: Created owner user {owner_user.email} with tenant_id={owner_user.tenant_id} (expected={db_tenant.id})")
     
     return db_tenant
+
+@router.put("/{tenant_id}", response_model=TenantResponse)
+def update_tenant(
+    tenant_id: int,
+    tenant: TenantBase,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_superadmin)
+):
+    db_tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
+    if not db_tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found")
+
+    db_tenant.company_name = tenant.company_name
+    db_tenant.contact_email = tenant.contact_email
+    db_tenant.contact_phone = tenant.contact_phone
+    db_tenant.address = tenant.address
+    db.commit()
+    db.refresh(db_tenant)
+    return db_tenant
+
+@router.delete("/{tenant_id}")
+def delete_tenant(
+    tenant_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_superadmin)
+):
+    db_tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
+    if not db_tenant:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tenant not found")
+
+    db.delete(db_tenant)
+    db.commit()
+    return {"detail": "Tenant deleted"}
 
 @router.get("/", response_model=List[TenantResponse])
 def list_tenants(
