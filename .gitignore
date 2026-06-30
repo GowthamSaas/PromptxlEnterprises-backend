@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables
+.env
+.env.local
+.env.production
+.env.example
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# SQLite
+*.db
+*.sqlite3
+
+# PostgreSQL Dumps
+*.sql
+*.dump
+
+# Alembic
+alembic/versions/*.pyc
+
+# FastAPI
+*.pid
+
+# Uploaded Files
+uploads/
+media/
+static/uploads/
+
+# Temporary Files
+tmp/
+temp/
+
+# Secrets
+secrets.json
+credentials.json
+
+# Node Modules (if frontend inside same repo)
+node_modules/
+
+# Coverage
+coverage.xml
+
+# Python Packaging
+pip-wheel-metadata/
+
+# Cache
+.cache/
