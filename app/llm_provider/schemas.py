@@ -1,0 +1,35 @@
+from datetime import datetime
+from typing import List, Literal, Optional
+
+from pydantic import BaseModel, Field
+
+ProviderName = Literal["openai", "claude", "gemini"]
+
+
+class ConnectProviderRequest(BaseModel):
+    provider: ProviderName = Field(..., description="Provider name")
+    api_key: str = Field(..., min_length=1, description="API key for the provider")
+
+
+class DisconnectProviderRequest(BaseModel):
+    provider: ProviderName = Field(..., description="Provider name")
+
+
+class ProviderResponse(BaseModel):
+    id: int
+    user_id: int
+    provider: str
+    validated_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ProviderListResponse(BaseModel):
+    providers: List[ProviderResponse]
+    count: int
+
+    class Config:
+        from_attributes = True
