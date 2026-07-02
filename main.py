@@ -7,6 +7,7 @@ from app.database import engine, Base, SessionLocal
 from app.routers import auth, users, applications, assignments
 from app.routers import tenants
 from app.llm_provider.router import router as llm_provider_router
+from app.ai_generator.router import router as ai_generator_router
 from app.auth.security import get_password_hash
 from app.models.user import User, UserRole
 
@@ -134,6 +135,7 @@ app.include_router(applications.router, prefix="/api/applications", tags=["Appli
 app.include_router(assignments.router, prefix="/api/assignments", tags=["Assignments"])
 app.include_router(tenants.router, prefix="/api/tenants", tags=["Tenants"])
 app.include_router(llm_provider_router, prefix="/api/llm-providers", tags=["LLM Providers"])
+app.include_router(ai_generator_router, prefix="/api/ai-generator", tags=["AI Generator"])
 
 @app.get("/")
 def root():
