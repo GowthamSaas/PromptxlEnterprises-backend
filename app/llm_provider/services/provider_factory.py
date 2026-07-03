@@ -1,12 +1,14 @@
 from app.llm_provider.services.claude_service import ClaudeProviderService
 from app.llm_provider.services.gemini_service import GeminiProviderService
 from app.llm_provider.services.openai_service import OpenAIProviderService
+from app.llm_provider.services.minimax_service import MiniMaxProviderService
 from app.llm_provider.utils import normalize_provider
 
 _PROVIDER_SERVICES = {
     "openai": OpenAIProviderService,
     "claude": ClaudeProviderService,
     "gemini": GeminiProviderService,
+    "minimax": MiniMaxProviderService,
 }
 
 
