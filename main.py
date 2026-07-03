@@ -10,6 +10,7 @@ from app.llm_provider.router import router as llm_provider_router
 from app.ai_generator.router import router as ai_generator_router
 from app.auth.security import get_password_hash
 from app.models.user import User, UserRole
+from app.connectors.router import router as connectors_router
 
 def ensure_userrole_enum():
     with engine.begin() as conn:
@@ -136,7 +137,7 @@ app.include_router(assignments.router, prefix="/api/assignments", tags=["Assignm
 app.include_router(tenants.router, prefix="/api/tenants", tags=["Tenants"])
 app.include_router(llm_provider_router, prefix="/api/llm-providers", tags=["LLM Providers"])
 app.include_router(ai_generator_router, prefix="/api/ai-generator", tags=["AI Generator"])
-
+app.include_router(connectors_router, prefix="/api/connectors",tags=["connectors"])
 @app.get("/")
 def root():
     return {"message": "PromptXL Enterprise API", "version": "1.0.0"}
@@ -144,3 +145,5 @@ def root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+

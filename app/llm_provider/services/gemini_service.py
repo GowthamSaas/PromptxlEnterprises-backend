@@ -17,9 +17,15 @@ class GeminiProviderService:
     def validate_api_key(self, api_key: str) -> bool:
         try:
             genai = self._get_client(api_key)
-            genai.get_model("gemini-1.5-flash")
+
+            models = list(genai.list_models())
+
+            if not models:
+               raise RuntimeError("No models found")
+
             return True
-        except Exception as exc:  # pragma: no cover - SDK may raise various errors
+
+        except Exception as exc:
             raise RuntimeError(f"Invalid Gemini API key: {exc}") from exc
 
     def list_models(self, api_key: str | None = None) -> list[dict[str, Any]]:
