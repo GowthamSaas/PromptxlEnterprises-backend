@@ -3,7 +3,7 @@ from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-ProviderName = Literal["openai", "claude", "gemini"]
+ProviderName = Literal["openai", "claude", "gemini" , "minimax"]
 
 
 class ConnectProviderRequest(BaseModel):

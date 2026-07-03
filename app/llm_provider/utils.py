@@ -2,11 +2,12 @@ from typing import Any
 
 from app.llm_provider.schemas import ProviderListResponse, ProviderResponse
 
-SUPPORTED_PROVIDERS = ("openai", "claude", "gemini")
+SUPPORTED_PROVIDERS = ("openai", "claude", "gemini" , "minimax")
 PROVIDER_DISPLAY_NAMES = {
     "openai": "OpenAI",
     "claude": "Anthropic Claude",
     "gemini": "Google Gemini",
+    "minimax": "Minimax",
 }
 
 
