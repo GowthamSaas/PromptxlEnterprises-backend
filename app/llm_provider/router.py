@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, require_owner, require_admin_or_owner
 from app.database import get_db
 from app.llm_provider.schemas import (
     ConnectProviderRequest,
@@ -16,7 +16,8 @@ from app.llm_provider.utils import (
     build_provider_list_response,
     build_provider_response,
 )
-from app.models.user import User
+from app.models.user import User, UserRole
+from app.models.tenant import Tenant
 
 router = APIRouter()
 
@@ -29,10 +30,10 @@ router = APIRouter()
 def connect_provider_endpoint(
     payload: ConnectProviderRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_owner),
 ) -> ProviderResponse:
     """
-    Connect a new LLM Provider
+    Connect a new LLM Provider (Owner only)
     """
 
     try:
@@ -65,10 +66,10 @@ def connect_provider_endpoint(
 def disconnect_provider_endpoint(
     payload: DisconnectProviderRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_owner),
 ):
     """
-    Disconnect Provider
+    Disconnect Provider (Owner only)
     """
 
     removed = LLMProviderService.disconnect_provider(
@@ -90,15 +91,27 @@ def disconnect_provider_endpoint(
 )
 def list_providers(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_or_owner),
 ):
     """
-    Get Connected Providers
+    Get Connected Providers (Admin/Owner only)
     """
 
+    # Check if user is owner (role can be string or enum)
+    is_owner = current_user.role == UserRole.OWNER or current_user.role == "owner"
+    
+    if is_owner:
+        user_id = current_user.id
+    else:
+        # If admin, get owner's providers from tenant
+        tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
+        if not tenant or not tenant.created_by:
+            return build_provider_list_response([])
+        user_id = tenant.created_by
+    
     providers = LLMProviderService.get_connected_providers(
         db=db,
-        user_id=current_user.id,
+        user_id=user_id,
     )
 
     return build_provider_list_response(providers)
@@ -108,16 +121,31 @@ def list_providers(
 def list_provider_models(
     provider: str,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_admin_or_owner),
 ) -> dict[str, Any]:
     """
-    Get Models for Connected Provider
+    Get Models for Connected Provider (Admin/Owner only)
     """
+
+    # Check if user is owner (role can be string or enum)
+    is_owner = current_user.role == UserRole.OWNER or current_user.role == "owner"
+    
+    if is_owner:
+        user_id = current_user.id
+    else:
+        # If admin, get owner's providers from tenant
+        tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
+        if not tenant or not tenant.created_by:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Tenant or owner not found"
+            )
+        user_id = tenant.created_by
 
     try:
         models = LLMProviderService.get_provider_models(
             db=db,
-            user_id=current_user.id,
+            user_id=user_id,
             provider=provider,
         )
 

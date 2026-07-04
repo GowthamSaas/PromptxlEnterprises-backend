@@ -146,6 +146,8 @@ class ConnectorService:
         provider: ConnectorProvider
     ):
 
+        self._check_permission(current_user)
+
         connector = crud.get_connector_by_provider(
             db=db,
             tenant_id=current_user.tenant_id,
@@ -170,6 +172,8 @@ class ConnectorService:
         db: Session,
         current_user: User
     ):
+
+        self._check_permission(current_user)
 
         return crud.get_connectors(
             db=db,

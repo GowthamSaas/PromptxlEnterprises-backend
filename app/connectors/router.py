@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, require_owner, require_admin_or_owner
 
 from app.models.user import User
 
@@ -29,7 +29,7 @@ router = APIRouter()
 
 
 # =====================================================
-# Connect
+# Connect (Owner only)
 # =====================================================
 
 @router.post(
@@ -39,7 +39,7 @@ router = APIRouter()
 async def connect_connector(
     request: ConnectConnectorRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_owner)
 ):
 
     connector = await connector_service.connect(
@@ -57,7 +57,7 @@ async def connect_connector(
 
 
 # =====================================================
-# Get All Connectors
+# Get All Connectors (Admin/Owner only)
 # =====================================================
 
 @router.get(
@@ -66,7 +66,7 @@ async def connect_connector(
 )
 async def list_connectors(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin_or_owner)
 ):
 
     connectors = await connector_service.get_connectors(
@@ -80,7 +80,7 @@ async def list_connectors(
 
 
 # =====================================================
-# Get One Connector
+# Get One Connector (Admin/Owner only)
 # =====================================================
 
 @router.get(
@@ -90,7 +90,7 @@ async def list_connectors(
 async def get_connector(
     provider: ConnectorProvider,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_admin_or_owner)
 ):
 
     connector = await connector_service.get_connector(
@@ -103,7 +103,7 @@ async def get_connector(
 
 
 # =====================================================
-# Disconnect
+# Disconnect (Owner only)
 # =====================================================
 
 @router.delete(
@@ -113,7 +113,7 @@ async def get_connector(
 async def disconnect_connector(
     request: DisconnectConnectorRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(require_owner)
 ):
 
     return await connector_service.disconnect(
