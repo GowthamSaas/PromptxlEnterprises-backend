@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.database import SessionLocal
 from app.llm_provider import crud
 from app.llm_provider.models import LLMProvider
 from app.llm_provider.services.encryption_service import (
@@ -62,6 +63,31 @@ class LLMProviderService:
         )
 
     @staticmethod
+    def get_connected_provider(
+        user_id: int,
+        provider: str | None = None,
+    ) -> LLMProvider | None:
+        db = SessionLocal()
+        try:
+            if provider:
+                return crud.get_user_provider(
+                    db=db,
+                    user_id=user_id,
+                    provider=provider,
+                )
+            return crud.get_all_user_providers(db=db, user_id=user_id)[0] if crud.get_all_user_providers(db=db, user_id=user_id) else None
+        finally:
+            db.close()
+
+    @staticmethod
+    def decrypt_api_key(encrypted_api_key: str) -> str:
+        return decrypt_api_key(encrypted_api_key)
+
+    @staticmethod
+    def get_provider_service(provider: str, api_key: str | None = None):
+        return get_provider_service(provider, api_key=api_key)
+
+    @staticmethod
     def get_provider_models(
         db: Session,
         user_id: int,
@@ -89,3 +115,8 @@ class LLMProviderService:
         )
 
         return provider_service.list_models(api_key)
+
+
+llm_provider_service = LLMProviderService()
+
+    

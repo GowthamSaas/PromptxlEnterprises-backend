@@ -136,7 +136,7 @@ class MiniMaxProviderService:
         api_key: str | None = None,
         prompt: str = "",
         model: str = "MiniMax-M1",
-    ) -> dict[str, Any]:
+     ) -> dict[str, Any]:
 
         client = self._get_client(api_key)
 
@@ -145,12 +145,23 @@ class MiniMaxProviderService:
                 model=model,
                 messages=[
                     {
+                       "role": "system",
+                       "content": """
+                        You must return ONLY valid JSON.
+
+                        Do not explain.
+                        Do not use markdown.
+                        Do not wrap with ```json.
+                        Return only the JSON object.
+                        """,
+                   },
+                   {
                         "role": "user",
                         "content": prompt,
-                    }
-                ],
-                temperature=0.7,
-            )
+                    },
+               ],
+               temperature=0.2,
+           )
 
             return {
                 "id": completion.id,
@@ -158,4 +169,6 @@ class MiniMaxProviderService:
             }
 
         except Exception as exc:
-            raise RuntimeError(f"MiniMax generation failed: {exc}") from exc
+            raise RuntimeError(
+                f"MiniMax generation failed: {exc}"
+            ) from exc

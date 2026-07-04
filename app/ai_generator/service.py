@@ -1,67 +1,49 @@
-from typing import Any
+from app.ai_generator.provider_selector import ProviderSelector
+from app.ai_generator.prompt_builder import PromptBuilder
+from app.ai_generator.response_parser import ResponseParser
 
-from .exceptions import ProviderUnavailableError, InvalidGenerationResponseError
-from .file_generator import build_generated_files
-from .prompt_builder import build_prompt
-from .provider_selector import select_provider
-from .response_parser import parse_generation_response
-from .stream_parser import merge_stream_chunks
-from .template_manager import get_template_description
-from .validators import validate_generation_payload
+from app.ai_generator.services.generation_service import GenerationService
 
 
-class AIGenerationService:
-    def __init__(self) -> None:
-        self.provider = None
+class AIGeneratorService:
 
-    def generate_app(self, prompt: str, app_name: str | None = None, template: str | None = None, provider: str | None = None, stream: bool = False) -> dict[str, Any]:
-        selected_provider = select_provider(provider)
-        self.provider = selected_provider
+    def __init__(self):
+        self.provider_selector = ProviderSelector()
+        self.prompt_builder = PromptBuilder()
+        self.generation_service = GenerationService()
+        self.response_parser = ResponseParser()
 
-        system_prompt = build_prompt(prompt, app_name=app_name, template=template)
-        template_hint = get_template_description(template)
-        if template_hint:
-            system_prompt = f"{system_prompt}\n\nTemplate guidance: {template_hint}"
+    async def generate(self, user, request):
 
-        if stream:
-            return {
-                "success": True,
-                "provider": selected_provider,
-                "message": "Streaming generation is enabled.",
-                "metadata": {"stream": True, "prompt_preview": system_prompt[:160]},
-            }
+        # Get connected provider and API key
+        provider = await self.provider_selector.get_provider(
+            user=user,
+            provider=request.provider,
+            model=request.model
+        )
 
-        mocked_payload = {
-            "app_name": app_name or "GeneratedApp",
-            "summary": "Mock AI generation completed successfully.",
-            "files": [
-                {
-                    "path": "README.md",
-                    "content": f"# {app_name or 'GeneratedApp'}\n\nGenerated from prompt: {prompt}",
-                }
-            ],
-        }
+        # Build final prompt
+        prompt = self.prompt_builder.build(
+            prompt=request.prompt
+        )
 
-        parsed = parse_generation_response(__import__("json").dumps(mocked_payload))
-        validate_generation_payload(parsed)
-        generated_files = build_generated_files(parsed)
+        # Generate AI response
+        response = await self.generation_service.generate(
+            provider=provider,
+            prompt=prompt
+        )
+
+        # Parse response
+        parsed_response = self.response_parser.parse(
+            response=response
+        )
 
         return {
             "success": True,
-            "app_name": parsed.get("app_name"),
-            "provider": selected_provider,
-            "files": generated_files,
-            "summary": parsed.get("summary"),
-            "message": "AI generation completed successfully.",
-            "metadata": {"prompt": system_prompt, "stream": False},
+            "provider": provider.provider,
+            "model": provider.model,
+            "response": parsed_response
         }
 
-    def generate_stream(self, prompt: str, app_name: str | None = None, template: str | None = None, provider: str | None = None) -> list[str]:
-        selected_provider = select_provider(provider)
-        self.provider = selected_provider
 
-        system_prompt = build_prompt(prompt, app_name=app_name, template=template)
-        return [f"provider={selected_provider}", f"prompt={system_prompt[:120]}"]
-
-    def build_stream_response(self, chunks: list[str]) -> str:
-        return merge_stream_chunks(chunks)
+ai_generator_service = AIGeneratorService()

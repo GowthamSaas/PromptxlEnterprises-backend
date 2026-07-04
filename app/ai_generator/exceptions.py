@@ -1,10 +1,13 @@
-class AIGenerationError(Exception):
-    """Raised when the AI generation workflow fails."""
+    class AIGeneratorException(Exception):
+    """Base AI Generator Exception"""
+    pass
 
 
-class ProviderUnavailableError(AIGenerationError):
-    """Raised when the configured provider is unavailable."""
+class ProviderNotFoundException(AIGeneratorException):
+    """Provider not connected"""
+    pass
 
 
-class InvalidGenerationResponseError(AIGenerationError):
-    """Raised when the model returns an unusable response."""
+class GenerationFailedException(AIGeneratorException):
+    """Generation failed"""
+    pass

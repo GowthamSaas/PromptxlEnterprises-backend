@@ -8,8 +8,10 @@ class GeminiProviderService:
     def _get_client(self, api_key: str | None = None):
         try:
             import google.generativeai as genai
-        except ImportError as exc:  # pragma: no cover - depends on environment
-            raise RuntimeError("The google-generativeai SDK is not installed") from exc
+        except ImportError as exc:
+            raise RuntimeError(
+                "The google-generativeai SDK is not installed"
+            ) from exc
 
         genai.configure(api_key=api_key or self.api_key)
         return genai
@@ -21,20 +23,49 @@ class GeminiProviderService:
             models = list(genai.list_models())
 
             if not models:
-               raise RuntimeError("No models found")
+                raise RuntimeError("No models found")
 
             return True
 
         except Exception as exc:
-            raise RuntimeError(f"Invalid Gemini API key: {exc}") from exc
+            raise RuntimeError(
+                f"Invalid Gemini API key: {exc}"
+            ) from exc
 
-    def list_models(self, api_key: str | None = None) -> list[dict[str, Any]]:
+    def list_models(
+        self,
+        api_key: str | None = None,
+    ) -> list[dict[str, Any]]:
+
         genai = self._get_client(api_key)
+
         models = genai.list_models()
-        return [{"name": model.name} for model in models]
 
-    def generate_completion(self, api_key: str | None = None, prompt: str = "", model: str = "gemini-1.5-flash") -> dict[str, Any]:
+        return [
+            {"name": model.name}
+            for model in models
+        ]
+
+    def generate_completion(
+        self,
+        api_key: str | None = None,
+        prompt: str = "",
+        model: str = "gemini-1.5-flash",
+    ) -> dict[str, Any]:
+
         genai = self._get_client(api_key)
-        model_client = genai.GenerativeModel(model)
-        response = model_client.generate_content(prompt)
-        return {"text": response.text}
+
+        model_client = genai.GenerativeModel(
+            model_name=model
+        )
+
+        response = model_client.generate_content(
+            prompt,
+            generation_config={
+                "temperature": 0.2,
+            },
+        )
+
+        return {
+            "text": response.text
+        }
