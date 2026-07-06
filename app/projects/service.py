@@ -7,6 +7,11 @@ from app.projects.schemas import (
     ProjectUpdateRequest,
 )
 
+from app.projects.services.export_service import (
+    export_service,
+)
+
+
 
 class ProjectService:
 
@@ -26,6 +31,7 @@ class ProjectService:
             model=request.model,
             status="generated",
         )
+
 
     @staticmethod
     def get_project(
@@ -100,6 +106,28 @@ class ProjectService:
         )
 
         return {"message": "Project deleted successfully."}
+
+
+    @staticmethod
+    def export_project(
+        db: Session,
+        project_id: int,
+    ):
+
+        project = crud.get_project(
+            db=db,
+            project_id=project_id,
+        )
+
+        if project is None:
+            raise ValueError(
+               "Project not found."
+            )
+
+        return export_service.export_project(
+            db=db,
+            project=project,
+        )
 
 
 project_service = ProjectService()

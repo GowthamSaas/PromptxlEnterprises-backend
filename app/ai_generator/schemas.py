@@ -13,6 +13,8 @@ class GenerateRequest(BaseModel):
 
 class GenerateResponse(BaseModel):
     success: bool
+    project_id: int
+    project_name: str
     provider: str
     model: str
     response: Dict[str, Any]
