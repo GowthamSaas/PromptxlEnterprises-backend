@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.projects.models import Project, ProjectFile
+from app.projects.models import Project
 
 
 # -------------------------
@@ -67,57 +67,4 @@ def delete_project(
 ):
 
     db.delete(project)
-    db.commit()
-
-
-# -------------------------
-# Project Files CRUD
-# -------------------------
-
-def create_project_file(
-    db: Session,
-    **kwargs,
-) -> ProjectFile:
-
-    project_file = ProjectFile(**kwargs)
-
-    db.add(project_file)
-    db.commit()
-    db.refresh(project_file)
-
-    return project_file
-
-
-def create_project_files(
-    db: Session,
-    files: list[ProjectFile],
-):
-
-    db.add_all(files)
-    db.commit()
-
-
-def get_project_files(
-    db: Session,
-    project_id: int,
-):
-
-    return (
-        db.query(ProjectFile)
-        .filter(ProjectFile.project_id == project_id)
-        .all()
-    )
-
-
-def delete_project_files(
-    db: Session,
-    project_id: int,
-):
-
-    (
-        db.query(ProjectFile)
-        .filter(ProjectFile.project_id == project_id)
-        .delete()
-    )
-
     db.commit()

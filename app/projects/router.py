@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from fastapi.responses import FileResponse
+from pathlib import Path
+
 
 from app.database import get_db
 from app.auth.dependencies import get_current_user
@@ -108,6 +111,37 @@ def delete_project(
             db=db,
             project_id=project_id,
         )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
+
+
+@router.get(
+    "/{project_id}/export",
+)
+def export_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    try:
+
+        zip_path: Path = project_service.export_project(
+            db=db,
+            project_id=project_id,
+        )
+
+        
+       
+
+        return FileResponse(
+            path=zip_path,
+            filename=f"{project_service.get_project(db, project_id).name}.zip",
+            media_type="application/zip",
+        )
+
     except Exception as exc:
         raise HTTPException(
             status_code=400,

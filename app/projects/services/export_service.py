@@ -1,59 +1,89 @@
 from pathlib import Path
+import shutil
+import tempfile
 import zipfile
 
+from sqlalchemy.orm import Session
+
 from app.projects.models import Project
+from app.project_files import crud as project_file_crud
 
 
 class ExportService:
-
-    BASE_DIRECTORY = Path("generated_projects")
-
-    EXPORT_DIRECTORY = Path("exports")
+    """
+    Export project from database as temporary ZIP.
+    """
 
     def export_project(
         self,
+        db: Session,
         project: Project,
     ) -> Path:
-        """
-        Export project as ZIP file.
-        """
 
-        project_path = (
-            self.BASE_DIRECTORY
-            / f"project_{project.id}_{project.name.replace(' ', '_')}"
+        project_files = project_file_crud.get_project_files(
+            db=db,
+            project_id=project.id,
         )
 
-        if not project_path.exists():
+        if not project_files:
             raise FileNotFoundError(
-                "Project folder not found."
+                "Project files not found."
             )
 
-        self.EXPORT_DIRECTORY.mkdir(
-            parents=True,
-            exist_ok=True,
+        base_temp = Path(
+            tempfile.mkdtemp()
         )
 
-        zip_path = (
-            self.EXPORT_DIRECTORY
-            / f"{project.name.replace(' ', '_')}.zip"
-        )
+        temp_dir = base_temp / project.name.replace(" ", "_")
 
-        with zipfile.ZipFile(
-            zip_path,
-            "w",
-            zipfile.ZIP_DEFLATED,
-        ) as zipf:
+        temp_dir.mkdir(
+           parents=True,
+           exist_ok=True,
+       )
 
-            for file in project_path.rglob("*"):
+        try:
 
-                if file.is_file():
+            for file in project_files:
 
-                    zipf.write(
-                        file,
-                        file.relative_to(project_path),
-                    )
+                file_path = temp_dir / file.file_path
 
-        return zip_path
+                file_path.parent.mkdir(
+                    parents=True,
+                    exist_ok=True,
+                )
+
+                file_path.write_text(
+                    file.content,
+                    encoding="utf-8",
+                )
+
+            zip_path = (
+               base_temp.parent
+               / f"{project.name.replace(' ', '_')}.zip"
+            )
+
+            with zipfile.ZipFile(
+                zip_path,
+                "w",
+                zipfile.ZIP_DEFLATED,
+            ) as zipf:
+                for file in temp_dir.rglob("*"):
+
+                    if file.is_file():
+
+                        zipf.write(
+                            file,
+                            file.relative_to(base_temp),
+                        )
+
+            return zip_path
+
+        finally:
+
+            shutil.rmtree(
+                base_temp,
+                ignore_errors=True,
+            )
 
 
 export_service = ExportService()

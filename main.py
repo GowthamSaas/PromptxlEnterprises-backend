@@ -12,6 +12,7 @@ from app.auth.security import get_password_hash
 from app.models.user import User, UserRole
 from app.connectors.router import router as connectors_router
 from app.projects.router import router as projects_router
+from app.project_files.router import router as project_files_router
 
 def ensure_userrole_enum():
     with engine.begin() as conn:
@@ -140,6 +141,7 @@ app.include_router(llm_provider_router, prefix="/api/llm-providers", tags=["LLM 
 app.include_router(ai_generator_router, prefix="/api/ai-generator", tags=["AI Generator"])
 app.include_router(connectors_router, prefix="/api/connectors",tags=["connectors"])
 app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
+app.include_router(project_files_router, prefix="/api/project-files", tags=["Project Files"])
 @app.get("/")
 def root():
     return {"message": "PromptXL Enterprise API", "version": "1.0.0"}

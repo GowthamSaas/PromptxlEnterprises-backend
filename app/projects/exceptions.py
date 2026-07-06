@@ -14,5 +14,3 @@ class ProjectExportException(ProjectException):
     """Raised when export fails."""
 
 
-class ProjectFileException(ProjectException):
-    """Raised when file operation fails."""
