@@ -56,6 +56,10 @@ class ConnectorResponse(BaseModel):
 
     updated_at: Optional[datetime] = None
 
+    connected_by: Optional[str] = None
+    last_used: Optional[datetime] = None
+
+
     class Config:
         from_attributes = True
 

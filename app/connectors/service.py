@@ -97,6 +97,16 @@ class ConnectorService:
                 metadata=provider_data["metadata"]
             )
 
+        db.refresh(connector)
+
+        connector.connected_by = (
+        connector.creator.full_name
+        if connector.creator
+        else None
+       )
+
+        connector.last_used = connector.updated_at or connector.connected_at
+
         return connector
 
     # ----------------------------------------
@@ -175,10 +185,30 @@ class ConnectorService:
 
         self._check_permission(current_user)
 
-        return crud.get_connectors(
+        connectors = crud.get_connectors(
             db=db,
             tenant_id=current_user.tenant_id
         )
+
+        result = []
+
+        for connector in connectors:
+
+            result.append({
+                "id": connector.id,
+                "provider": connector.provider,
+                "connected": connector.connected,
+                "account_name": connector.account_name,
+                "provider_metadata": connector.provider_metadata,
+                "connected_at": connector.connected_at,
+                "disconnected_at": connector.disconnected_at,
+                "created_at": connector.created_at,
+                "updated_at": connector.updated_at,
+                "connected_by": connector.creator.full_name if connector.creator else None,
+                "last_used": connector.updated_at or connector.connected_at
+            })
+
+        return result
 
 
 connector_service = ConnectorService()
