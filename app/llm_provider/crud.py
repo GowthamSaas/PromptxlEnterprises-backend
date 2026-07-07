@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.llm_provider.models import LLMProvider
 from app.llm_provider.utils import normalize_provider
@@ -99,6 +99,7 @@ def get_all_user_providers(
 
     return (
         db.query(LLMProvider)
+        .options(joinedload(LLMProvider.user))
         .filter(LLMProvider.user_id == user_id)
         .order_by(LLMProvider.provider)
         .all()

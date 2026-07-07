@@ -85,6 +85,44 @@ def disconnect_provider_endpoint(
         )
 
 
+# @router.get(
+#     "/providers",
+#     response_model=ProviderListResponse,
+# )
+# def list_providers(
+#     db: Session = Depends(get_db),
+#     current_user: User = Depends(require_admin_or_owner),
+# ):
+#     """
+#     Get Connected Providers (Admin/Owner only)
+#     """
+#     print("========== DEBUG ==========")
+#     print("Current User ID:", current_user.id)
+#     print("Current Role:", current_user.role)
+#     print("Current Tenant ID:", current_user.tenant_id)
+
+#     # Check if user is owner (role can be string or enum)
+#     is_owner = current_user.role == UserRole.OWNER or current_user.role == "owner"
+    
+#     if is_owner:
+#         user_id = current_user.id
+#     else:
+#         # If admin, get owner's providers from tenant
+#         tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
+#         if not tenant or not tenant.created_by:
+#             return build_provider_list_response([])
+#         user_id = tenant.created_by
+    
+#     providers = LLMProviderService.get_connected_providers(
+#         db=db,
+#         user_id=user_id,
+#     )
+    
+#     print("Providers Found:", providers)
+#     print("===========================")
+#     return build_provider_list_response(providers)
+
+
 @router.get(
     "/providers",
     response_model=ProviderListResponse,
@@ -97,22 +135,58 @@ def list_providers(
     Get Connected Providers (Admin/Owner only)
     """
 
-    # Check if user is owner (role can be string or enum)
-    is_owner = current_user.role == UserRole.OWNER or current_user.role == "owner"
-    
+    print("\n========== DEBUG ==========")
+    print("Current User ID:", current_user.id)
+    print("Current Role:", current_user.role)
+    print("Current Tenant ID:", current_user.tenant_id)
+
+    is_owner = (
+        current_user.role == UserRole.OWNER
+        or current_user.role == "owner"
+    )
+
+    print("Is Owner:", is_owner)
+
     if is_owner:
+
         user_id = current_user.id
+        print("Owner User ID:", user_id)
+
     else:
-        # If admin, get owner's providers from tenant
-        tenant = db.query(Tenant).filter(Tenant.id == current_user.tenant_id).first()
-        if not tenant or not tenant.created_by:
+
+        print(">>> ADMIN FLOW <<<")
+
+        tenant = (
+            db.query(Tenant)
+            .filter(Tenant.id == current_user.tenant_id)
+            .first()
+        )
+
+        print("Tenant Object:", tenant)
+
+        if tenant:
+            print("Tenant.id:", tenant.id)
+            print("Tenant.created_by:", tenant.created_by)
+
+        if not tenant:
+            print("Tenant NOT FOUND")
             return build_provider_list_response([])
+
+        if not tenant.created_by:
+            print("Tenant.created_by is NULL")
+            return build_provider_list_response([])
+
         user_id = tenant.created_by
-    
+
+        print("Owner User ID:", user_id)
+
     providers = LLMProviderService.get_connected_providers(
         db=db,
         user_id=user_id,
     )
+
+    print("Providers Found:", providers)
+    print("===========================\n")
 
     return build_provider_list_response(providers)
 

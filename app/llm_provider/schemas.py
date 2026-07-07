@@ -23,6 +23,12 @@ class ProviderResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    # ---------- Admin UI ----------
+    owner_connected: bool = False
+    connected_by: Optional[str] = None
+    connected_on: Optional[datetime] = None
+    last_used: Optional[datetime] = None
+
     class Config:
         from_attributes = True
 
