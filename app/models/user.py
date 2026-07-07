@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
+from app.project_assignments.models import ProjectAssignment
 
 import enum
 
@@ -107,6 +108,13 @@ class User(Base):
         "UserApplication",
         back_populates="user",
         cascade="all, delete-orphan"
+    )
+
+    assigned_projects = relationship(
+        "ProjectAssignment",
+        back_populates="user",
+        foreign_keys="ProjectAssignment.user_id",
+        cascade="all, delete-orphan",
     )
 
     llm_providers = relationship(
