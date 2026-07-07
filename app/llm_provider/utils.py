@@ -35,6 +35,12 @@ def build_provider_response(provider_record: Any) -> ProviderResponse:
         validated_at=provider_record.validated_at,
         created_at=provider_record.created_at,
         updated_at=provider_record.updated_at,
+
+        # -------- Admin UI --------
+        owner_connected=True,
+        connected_by=provider_record.user.full_name,
+        connected_on=provider_record.created_at,
+        last_used=provider_record.updated_at,
     )
 
 
