@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
+from app.project_assignments.models import ProjectAssignment
 
 
 class Project(Base):
@@ -53,6 +54,11 @@ class Project(Base):
         back_populates="project",
         cascade="all, delete-orphan",
     )
+    assigned_users = relationship(
+    "ProjectAssignment",
+    back_populates="project",
+    cascade="all, delete-orphan",
+)
 
 
 class ProjectFile(Base):

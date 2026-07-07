@@ -132,7 +132,9 @@ def export_project(
             db=db,
             project_id=project_id,
         )
-
+        print("ZIP Path:", zip_path)
+        print("Exists:", zip_path.exists())
+        print("ZIP Size:", zip_path.stat().st_size)
         
        
 
