@@ -110,12 +110,6 @@ class User(Base):
     cascade="all, delete-orphan",
 )
 
-    assigned_applications = relationship(
-    "UserApplication",
-    back_populates="user",
-    cascade="all, delete-orphan",
-)
-
     connected_llm_providers = relationship(
     "LLMProvider",
     back_populates="connected_user",
