@@ -26,7 +26,7 @@ class ProviderSelector:
 
         # Get connected provider from DB
         connected_provider = llm_provider_service.get_connected_provider(
-            user_id=user.id,
+            tenant_id=user.tenant_id,
             provider=provider,
         )
 

@@ -30,7 +30,7 @@ class Connector(Base):
         UniqueConstraint(
             "tenant_id",
             "provider",
-            name="uq_tenant_provider"
+            name="uq_connector_tenant_provider"
         ),
     )
 

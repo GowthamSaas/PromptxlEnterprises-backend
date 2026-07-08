@@ -30,7 +30,8 @@ def get_supported_providers() -> tuple[str, ...]:
 def build_provider_response(provider_record: Any) -> ProviderResponse:
     return ProviderResponse(
         id=provider_record.id,
-        user_id=provider_record.user_id,
+        tenant_id=provider_record.tenant_id,
+        connected_by_id=provider_record.connected_by,
         provider=provider_record.provider,
         validated_at=provider_record.validated_at,
         created_at=provider_record.created_at,
@@ -38,7 +39,7 @@ def build_provider_response(provider_record: Any) -> ProviderResponse:
 
         # -------- Admin UI --------
         owner_connected=True,
-        connected_by=provider_record.user.full_name,
+        connected_by=provider_record.connected_user.full_name,
         connected_on=provider_record.created_at,
         last_used=provider_record.updated_at,
     )

@@ -9,7 +9,8 @@ from app.llm_provider.utils import normalize_provider
 
 def connect_provider(
     db: Session,
-    user_id: int,
+    tenant_id: int,
+    connected_by: int,
     provider: str,
     encrypted_api_key: str,
 ) -> LLMProvider:
@@ -19,15 +20,17 @@ def connect_provider(
     existing = (
         db.query(LLMProvider)
         .filter(
-            LLMProvider.user_id == user_id,
+            LLMProvider.tenant_id == tenant_id,
             LLMProvider.provider == normalized_provider,
         )
         .first()
     )
 
     if existing is None:
+
         provider_record = LLMProvider(
-            user_id=user_id,
+            tenant_id=tenant_id,
+            connected_by=connected_by,
             provider=normalized_provider,
             encrypted_api_key=encrypted_api_key,
             validated_at=datetime.now(timezone.utc),
@@ -40,6 +43,7 @@ def connect_provider(
         return provider_record
 
     existing.encrypted_api_key = encrypted_api_key
+    existing.connected_by = connected_by
     existing.validated_at = datetime.now(timezone.utc)
 
     db.commit()
@@ -50,7 +54,7 @@ def connect_provider(
 
 def disconnect_provider(
     db: Session,
-    user_id: int,
+    tenant_id: int,
     provider: str,
 ) -> bool:
 
@@ -59,7 +63,7 @@ def disconnect_provider(
     provider_record = (
         db.query(LLMProvider)
         .filter(
-            LLMProvider.user_id == user_id,
+            LLMProvider.tenant_id == tenant_id,
             LLMProvider.provider == normalized_provider,
         )
         .first()
@@ -74,9 +78,9 @@ def disconnect_provider(
     return True
 
 
-def get_user_provider(
+def get_tenant_provider(
     db: Session,
-    user_id: int,
+    tenant_id: int,
     provider: str,
 ) -> Optional[LLMProvider]:
 
@@ -85,22 +89,22 @@ def get_user_provider(
     return (
         db.query(LLMProvider)
         .filter(
-            LLMProvider.user_id == user_id,
+            LLMProvider.tenant_id == tenant_id,
             LLMProvider.provider == normalized_provider,
         )
         .first()
     )
 
 
-def get_all_user_providers(
+def get_all_tenant_providers(
     db: Session,
-    user_id: int,
+    tenant_id: int,
 ) -> list[LLMProvider]:
 
     return (
         db.query(LLMProvider)
-        .options(joinedload(LLMProvider.user))
-        .filter(LLMProvider.user_id == user_id)
+        .options(joinedload(LLMProvider.connected_user))
+        .filter(LLMProvider.tenant_id == tenant_id)
         .order_by(LLMProvider.provider)
         .all()
     )
