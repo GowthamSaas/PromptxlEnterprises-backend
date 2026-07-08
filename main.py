@@ -4,7 +4,7 @@ from starlette.routing import Match
 from sqlalchemy import inspect, text
 from app.config import settings
 from app.database import engine, Base, SessionLocal
-from app.routers import auth, users, applications, assignments
+from app.routers import auth, users
 from app.routers import tenants
 from app.llm_provider.router import router as llm_provider_router
 from app.ai_generator.router import router as ai_generator_router
@@ -14,6 +14,9 @@ from app.connectors.router import router as connectors_router
 from app.projects.router import router as projects_router
 from app.project_files.router import router as project_files_router
 from app.project_assignments.router import router as project_assignment_router
+from app.ai_chat.router import router as ai_chat_router
+from app.ai_modifier.router import  router as ai_modifier_router
+
 
 
 def ensure_userrole_enum():
@@ -137,8 +140,6 @@ def create_default_superadmin():
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/users", tags=["Users"])
-app.include_router(applications.router, prefix="/api/applications", tags=["Applications"])
-app.include_router(assignments.router, prefix="/api/assignments", tags=["Assignments"])
 app.include_router(tenants.router, prefix="/api/tenants", tags=["Tenants"])
 app.include_router(llm_provider_router, prefix="/api/llm-providers", tags=["LLM Providers"])
 app.include_router(ai_generator_router, prefix="/api/ai-generator", tags=["AI Generator"])
@@ -146,6 +147,8 @@ app.include_router(connectors_router, prefix="/api/connectors",tags=["connectors
 app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
 app.include_router(project_files_router, prefix="/api/project-files", tags=["Project Files"])
 app.include_router(project_assignment_router, prefix="/api/project-assignments", tags=["Project Assignments"])
+app.include_router(ai_chat_router, prefix="/api/ai-chat", tags=["AI Chat"],)
+app.include_router( ai_modifier_router, prefix="/api/ai-modifier", tags=["AI Modifier"],)
 @app.get("/")
 def root():
     return {"message": "PromptXL Enterprise API", "version": "1.0.0"}
