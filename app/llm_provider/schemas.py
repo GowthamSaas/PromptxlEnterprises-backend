@@ -17,7 +17,8 @@ class DisconnectProviderRequest(BaseModel):
 
 class ProviderResponse(BaseModel):
     id: int
-    user_id: int
+    tenant_id: int
+    connected_by_id: int
     provider: str
     validated_at: Optional[datetime] = None
     created_at: datetime

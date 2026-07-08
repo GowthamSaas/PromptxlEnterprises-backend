@@ -14,10 +14,11 @@ class LLMProviderService:
 
     @staticmethod
     def connect_provider(
-        db: Session,
-        user_id: int,
-        provider: str,
-        api_key: str,
+      db: Session,
+      tenant_id: int,
+      connected_by: int,
+      provider: str,
+      api_key: str,
     ) -> LLMProvider:
 
         provider_service = get_provider_service(provider)
@@ -30,52 +31,62 @@ class LLMProviderService:
 
         # Save Database
         provider_record = crud.connect_provider(
-            db=db,
-            user_id=user_id,
-            provider=provider,
-            encrypted_api_key=encrypted_key,
+          db=db,
+          tenant_id=tenant_id,
+          connected_by=connected_by,
+          provider=provider,
+          encrypted_api_key=encrypted_key,
         )
 
         return provider_record
 
     @staticmethod
     def disconnect_provider(
-        db: Session,
-        user_id: int,
-        provider: str,
+      db: Session,
+      tenant_id: int,
+      provider: str,
     ) -> bool:
 
         return crud.disconnect_provider(
-            db=db,
-            user_id=user_id,
-            provider=provider,
+         db=db,
+         tenant_id=tenant_id,
+         provider=provider,
         )
 
     @staticmethod
     def get_connected_providers(
         db: Session,
-        user_id: int,
+        tenant_id: int,
     ):
 
-        return crud.get_all_user_providers(
+        return crud.get_all_tenant_providers(
             db=db,
-            user_id=user_id,
+            tenant_id=tenant_id,
         )
 
     @staticmethod
     def get_connected_provider(
-        user_id: int,
+        tenant_id: int,
         provider: str | None = None,
     ) -> LLMProvider | None:
+
         db = SessionLocal()
+
         try:
             if provider:
-                return crud.get_user_provider(
+                return crud.get_tenant_provider(
                     db=db,
-                    user_id=user_id,
+                    tenant_id=tenant_id,
                     provider=provider,
                 )
-            return crud.get_all_user_providers(db=db, user_id=user_id)[0] if crud.get_all_user_providers(db=db, user_id=user_id) else None
+
+            providers = crud.get_all_tenant_providers(
+                db=db,
+                tenant_id=tenant_id,
+            )
+
+            return providers[0] if providers else None
+
         finally:
             db.close()
 
@@ -90,14 +101,14 @@ class LLMProviderService:
     @staticmethod
     def get_provider_models(
         db: Session,
-        user_id: int,
+        tenant_id: int,
         provider: str,
     ):
 
-        provider_record = crud.get_user_provider(
-            db=db,
-            user_id=user_id,
-            provider=provider,
+        provider_record = crud.get_tenant_provider(
+          db=db,
+          tenant_id=tenant_id,
+           provider=provider,
         )
 
         if provider_record is None:

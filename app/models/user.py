@@ -103,30 +103,28 @@ class User(Base):
         back_populates="users",
         foreign_keys=[tenant_id]
     )
+    assigned_projects = relationship(
+    "ProjectAssignment",
+    back_populates="user",
+    foreign_keys="ProjectAssignment.user_id",
+    cascade="all, delete-orphan",
+)
 
     assigned_applications = relationship(
-        "UserApplication",
-        back_populates="user",
-        cascade="all, delete-orphan"
-    )
+    "UserApplication",
+    back_populates="user",
+    cascade="all, delete-orphan",
+)
 
-    assigned_projects = relationship(
-        "ProjectAssignment",
-        back_populates="user",
-        foreign_keys="ProjectAssignment.user_id",
-        cascade="all, delete-orphan",
-    )
+    connected_llm_providers = relationship(
+    "LLMProvider",
+    back_populates="connected_user",
+    foreign_keys="LLMProvider.connected_by",
+)
 
-    llm_providers = relationship(
-        "LLMProvider",
-        back_populates="user",
-        cascade="all, delete-orphan"
-    )
-
-    # Connectors created by this Owner/Admin
     created_connectors = relationship(
-        "Connector",
-        back_populates="creator",
-        foreign_keys="Connector.created_by",
-        cascade="all, delete-orphan"
-    )
+    "Connector",
+    back_populates="creator",
+    foreign_keys="Connector.created_by",
+    cascade="all, delete-orphan",
+)

@@ -91,3 +91,9 @@ class Tenant(Base):
         back_populates="tenant",
         cascade="all, delete-orphan"
     )
+
+    llm_providers = relationship(
+    "LLMProvider",
+    back_populates="tenant",
+    cascade="all, delete-orphan"
+)
