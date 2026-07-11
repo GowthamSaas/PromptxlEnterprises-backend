@@ -16,11 +16,13 @@ class ModifyRequest(BaseModel):
 
 class ModifiedFile(BaseModel):
 
+    action: str
+
     path: str
 
-    language: str
+    language: str | None = None
 
-    content: str
+    content: str | None = None
 
 
 class ModifyResponse(BaseModel):

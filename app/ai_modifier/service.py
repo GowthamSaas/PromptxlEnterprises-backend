@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.ai_chat.context_builder import (
-    context_builder,
+from app.ai_modifier.context_builder import (
+    ai_modifier_context_builder,
 )
 
 from app.ai_generator.provider_selector import (
@@ -22,6 +22,10 @@ from app.ai_modifier.file_update_service import (
 
 from app.ai_modifier.diff_service import (
     diff_service,
+)
+
+from app.ai_modifier.validation_service import (
+    validation_service,
 )
 
 
@@ -54,11 +58,10 @@ class AIModifierService:
         # Build Context
         # ----------------------------------
 
-        context = context_builder.build(
-            db=db,
-            project_id=request.project_id,
-            session_id=None,
-            prompt=request.prompt,
+        context = ai_modifier_context_builder.build(
+           db=db,
+           project_id=request.project_id,
+           prompt=request.prompt,
         )
 
         # ----------------------------------
@@ -101,6 +104,10 @@ Current Project:
         # Generate Response
         # ----------------------------------
 
+        print("=" * 60)
+        print("Prompt Length:", len(final_prompt))
+        print("=" * 60)
+
         response = await self.generation_service.generate(
             provider=provider,
             prompt=final_prompt,
@@ -117,6 +124,12 @@ Current Project:
         modified_files = parsed.get(
             "files",
             [],
+        )
+
+        validation_service.validate(
+            db=db,
+            project_id=request.project_id,
+            files=modified_files,
         )
 
         # ----------------------------------
@@ -152,7 +165,7 @@ Current Project:
                 "Project updated successfully.",
             ),
 
-            "modified_files": updated_files,
+            "modified_files": modified_files,
 
         }
 
