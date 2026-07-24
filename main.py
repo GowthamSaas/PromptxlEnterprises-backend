@@ -16,7 +16,7 @@ from app.project_files.router import router as project_files_router
 from app.project_assignments.router import router as project_assignment_router
 from app.ai_chat.router import router as ai_chat_router
 from app.ai_modifier.router import  router as ai_modifier_router
-
+from app.project_folders.router import router as project_folder_router
 
 
 def ensure_userrole_enum():
@@ -158,3 +158,10 @@ def health_check():
     return {"status": "healthy"}
 
 
+
+
+app.include_router(
+    project_folder_router,
+    prefix="/api/project-folders",
+    tags=["Project Folders"],
+)

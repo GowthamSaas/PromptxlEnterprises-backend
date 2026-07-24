@@ -101,3 +101,35 @@ class ProjectFile(Base):
         "Project",
         back_populates="files",
     )
+    
+class ProjectFolder(Base):
+    __tablename__ = "project_folders"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    project_id = Column(
+        Integer,
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    folder_name = Column(
+        String(255),
+        nullable=False,
+    )
+
+    folder_path = Column(
+        String(500),
+        nullable=False,
+    )
+
+    parent_folder_id = Column(
+        Integer,
+        ForeignKey("project_folders.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )

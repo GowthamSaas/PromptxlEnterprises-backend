@@ -1,9 +1,9 @@
-from app.project_files import crud
+from app.project_folders import crud
 
 
-class ExplorerService:
+class FolderExplorerService:
     """
-    Build VS Code style explorer tree.
+    Build folder tree.
     """
 
     @staticmethod
@@ -12,22 +12,20 @@ class ExplorerService:
         project_id: int,
     ):
 
-        files = crud.get_project_files(
+        folders = crud.get_project_folders(
             db=db,
             project_id=project_id,
         )
 
         tree = []
 
-        for file in files:
+        for folder in folders:
 
-            parts = file.file_path.split("/")
+            parts = folder.folder_path.split("/")
 
             current = tree
 
             for index, part in enumerate(parts):
-
-                is_file = index == len(parts) - 1
 
                 existing = next(
                     (
@@ -43,22 +41,22 @@ class ExplorerService:
                     current_path = "/".join(parts[: index + 1])
 
                     existing = {
+                        "id": None,
                         "name": part,
-                        "type": "file" if is_file else "folder",
-                        "children": [] if not is_file else None,
+                        "type": "folder",
+                        "children": [],
                         "path": current_path,
                     }
 
-                    if is_file:
-                        existing["id"] = file.id
-                        existing["language"] = file.language
-
                     current.append(existing)
 
-                if not is_file:
-                    current = existing["children"]
+                # IMPORTANT FIX
+                if index == len(parts) - 1:
+                    existing["id"] = folder.id
+
+                current = existing["children"]
 
         return tree
 
 
-explorer_service = ExplorerService()
+folder_explorer_service = FolderExplorerService()
