@@ -130,4 +130,24 @@ class ProjectService:
         )
 
 
+    @staticmethod
+    def export_project_directory(
+        db: Session,
+        project_id: int,
+    ):
+
+        project = crud.get_project(
+            db=db,
+            project_id=project_id,
+        )
+
+        if project is None:
+            raise ValueError("Project not found.")
+
+        return export_service.export_project_directory(
+            db=db,
+            project=project,
+        )
+
+
 project_service = ProjectService()

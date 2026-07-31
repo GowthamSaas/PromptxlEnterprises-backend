@@ -35,10 +35,21 @@ class AIGeneratorService:
             prompt=prompt
         )
 
+
+        print("================ RAW RESPONSE ================")
+        print(response)
+
+        
+
+
         # Parse response
         parsed_response = self.response_parser.parse(
             response=response
         )
+
+        print("================ PARSED RESPONSE ================")
+        print(parsed_response)
+
 
         project = project_crud.create_project(
             db=db,
