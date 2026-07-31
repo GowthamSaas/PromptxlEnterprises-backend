@@ -95,25 +95,7 @@ class Connector(Base):
         nullable=True
     )
 
-    # --------------------------------------------------
-    # Provider Metadata
-    #
-    # Vercel:
-    # {
-    #     "teams": 1
-    # }
-    #
-    # GitHub:
-    # {
-    #     "repositories": 25
-    # }
-    #
-    # Supabase:
-    # {
-    #     "projects": 3,
-    #     "tables": 42
-    # }
-    # --------------------------------------------------
+  
 
     provider_metadata = Column(
         JSON,

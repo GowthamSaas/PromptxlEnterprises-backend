@@ -1,35 +1,4 @@
-# from typing import Any
 
-
-# class ResponseParser:
-#     """
-#     Responsible for parsing and normalizing
-#     responses from different LLM providers.
-#     """
-
-#     def parse(self, response: Any) -> str:
-#         """
-#         Normalize the response into plain text.
-#         """
-
-#         if response is None:
-#             return ""
-
-#         # Dictionary response
-#         if isinstance(response, dict):
-#             return (
-#                 response.get("text")
-#                 or response.get("content")
-#                 or response.get("message")
-#                 or ""
-#             )
-
-#         # String response
-#         if isinstance(response, str):
-#             return response
-
-#         # Fallback
-#         return str(response)
 
 
 
@@ -84,6 +53,10 @@ class ResponseParser:
             text,
             flags=re.MULTILINE,
         )
+
+        print("============== CLAUDE TEXT ==============")
+        print(text)
+        print("=========================================")
 
         try:
             return json.loads(text)

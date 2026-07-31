@@ -93,7 +93,11 @@ class Tenant(Base):
     )
 
     llm_providers = relationship(
-    "LLMProvider",
-    back_populates="tenant",
-    cascade="all, delete-orphan"
-)
+        "LLMProvider",
+        back_populates="tenant",
+        cascade="all, delete-orphan"
+    )
+    deployments = relationship(
+       "Deployment",
+       back_populates="tenant",
+    )

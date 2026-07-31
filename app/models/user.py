@@ -122,3 +122,10 @@ class User(Base):
     foreign_keys="Connector.created_by",
     cascade="all, delete-orphan",
 )
+
+    deployments = relationship(
+    "Deployment",
+    back_populates="creator",
+    foreign_keys="Deployment.created_by",
+    cascade="all, delete-orphan",
+)

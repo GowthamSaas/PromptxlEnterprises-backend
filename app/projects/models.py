@@ -54,6 +54,11 @@ class Project(Base):
         back_populates="project",
         cascade="all, delete-orphan",
     )
+    deployments = relationship(
+    "Deployment",
+    back_populates="project",
+    cascade="all, delete-orphan",
+)
     assigned_users = relationship(
     "ProjectAssignment",
     back_populates="project",

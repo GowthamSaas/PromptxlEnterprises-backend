@@ -39,8 +39,11 @@ class ClaudeProviderService:
 
         message = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=8192,
             system="""
+
+        
+            
 You must return ONLY valid JSON.
 
 Do not use markdown.
@@ -48,6 +51,7 @@ Do not use ```json.
 Do not explain.
 Return only the JSON object.
 """,
+        
             messages=[
                 {
                     "role": "user",
@@ -56,7 +60,18 @@ Return only the JSON object.
             ],
         )
 
+        # print("Stop Reason:", message.stop_reason)
+        # print("Usage:", message.usage)
+        # print("Content Blocks:", len(message.content))
+
+        text = ""
+
+        for block in message.content:
+
+            if hasattr(block, "text"):
+                text += block.text
+
         return {
             "id": message.id,
-            "text": message.content[0].text,
-        }
+            "text": text,
+        } 

@@ -2,6 +2,8 @@ from pathlib import Path
 import shutil
 import tempfile
 import zipfile
+import re
+
 
 from sqlalchemy.orm import Session
 
@@ -84,6 +86,59 @@ class ExportService:
                 base_temp,
                 ignore_errors=True,
             )
+
+
+
+
+    def export_project_directory(
+        self,
+        db: Session,
+        project: Project,
+    ) -> Path:
+
+        project_files = project_file_crud.get_project_files(
+            db=db,
+            project_id=project.id,
+        )
+
+        if not project_files:
+            raise FileNotFoundError(
+                "Project files not found."
+            )
+
+        base_temp = Path(tempfile.mkdtemp())
+
+        safe_name = re.sub(
+            r"[^a-z0-9-]",
+            "-",
+            project.name.lower(),
+        )
+
+        safe_name = re.sub(r"-+", "-", safe_name).strip("-")
+
+        temp_dir = base_temp / safe_name
+
+        temp_dir.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        for file in project_files:
+
+            file_path = temp_dir / file.file_path
+
+            file_path.parent.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            file_path.write_text(
+                file.content,
+                encoding="utf-8",
+            )
+
+        return temp_dir
+
 
 
 export_service = ExportService()
