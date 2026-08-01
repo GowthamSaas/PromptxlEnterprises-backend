@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Database
+    DATABASE_URL: Optional[str] = None
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_NAME: str = "promptxl_enterprise"
@@ -24,7 +25,9 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     @property
-    def DATABASE_URL(self) -> str:
+    def resolved_database_url(self) -> str:
+        if self.DATABASE_URL:
+            return self.DATABASE_URL
         return (
             f"postgresql://{self.DB_USER}:"
             f"{self.DB_PASSWORD}@"
