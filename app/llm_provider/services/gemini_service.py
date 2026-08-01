@@ -2,6 +2,21 @@ from typing import Any
 
 
 class GeminiProviderService:
+    APP_BUILDER_MODEL_IDS = (
+        "gemini-3.1-pro-preview",
+        "gemini-3-pro-preview",
+        "gemini-2.5-pro",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-2.5-flash",
+        "gemini-flash-latest",
+        "gemini-2.5-flash-lite",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-flash-lite-latest",
+        "gemini-2.0-flash-lite",
+    )
+
     def __init__(self, api_key: str | None = None):
         self.api_key = api_key
 
@@ -37,20 +52,16 @@ class GeminiProviderService:
         api_key: str | None = None,
     ) -> list[dict[str, Any]]:
 
-        genai = self._get_client(api_key)
-
-        models = genai.list_models()
-
         return [
-            {"name": model.name}
-            for model in models
+            {"id": model_id}
+            for model_id in self.APP_BUILDER_MODEL_IDS
         ]
 
     def generate_completion(
         self,
         api_key: str | None = None,
         prompt: str = "",
-        model: str = "gemini-1.5-flash",
+        model: str = "gemini-3.1-pro-preview",
     ) -> dict[str, Any]:
 
         genai = self._get_client(api_key)
