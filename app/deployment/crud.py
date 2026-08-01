@@ -24,18 +24,18 @@ def create_deployment(
     deployment_metadata: dict | None = None,
     status: str = "queued",
 ) -> Deployment:
-
-    deployment_record = crud.create_deployment(
-        db=db,
-        tenant_id=user.tenant_id,
-        project_id=project.id,
-        created_by=user.id,
-        provider=request.provider,
-        deployment_method=request.deployment_method,
-        repository_name=github_result["repository_name"],
-        repository_url=github_result["repository_url"],
+    deployment = Deployment(
+        tenant_id=tenant_id,
+        project_id=project_id,
+        created_by=created_by,
+        provider=provider,
+        deployment_method=deployment_method,
+        repository_name=repository_name,
+        repository_url=repository_url,
+        deployment_id=deployment_id,
         deployment_url=deployment_url,
-        status="success",
+        deployment_metadata=deployment_metadata,
+        status=status,
     )
 
     db.add(deployment)
