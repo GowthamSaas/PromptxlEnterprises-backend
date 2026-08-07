@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.projects.models import Project
+from app.ai_chat.model import ChatSession, ChatMessage
 
 
 # -------------------------
@@ -65,6 +66,17 @@ def delete_project(
     db: Session,
     project: Project,
 ):
+    session_ids = db.query(ChatSession.id).filter(
+        ChatSession.project_id == project.id
+    ).subquery()
+
+    db.query(ChatMessage).filter(
+        ChatMessage.session_id.in_(session_ids)
+    ).delete(synchronize_session=False)
+
+    db.query(ChatSession).filter(
+        ChatSession.project_id == project.id
+    ).delete(synchronize_session=False)
 
     db.delete(project)
     db.commit()
