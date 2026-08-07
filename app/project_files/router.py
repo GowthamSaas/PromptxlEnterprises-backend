@@ -8,6 +8,7 @@ from app.project_files.schemas import (
     ProjectFileResponse,
     UpdateFileRequest,
     CreateFileRequest,
+    MoveFileRequest,
     RenameFileRequest,
 )
 
@@ -151,6 +152,26 @@ def create_project_file(
             status_code=400,
             detail=str(exc),
         )
+
+
+@router.put(
+    "/{file_id}/move",
+    response_model=ProjectFileResponse,
+)
+def move_project_file(
+    file_id: int,
+    request: MoveFileRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    try:
+        return project_file_service.move_project_file(
+            db=db,
+            file_id=file_id,
+            destination_path=request.destination_path,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
 
 
 @router.put(
