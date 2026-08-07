@@ -251,5 +251,73 @@ class DeploymentService:
             "message": "Project deployed successfully.",
         }
 
+    # ----------------------------------------
+    # Get Deployment
+    # ----------------------------------------
+
+    def get_deployment(
+        self,
+        db: Session,
+        deployment_id: int,
+    ):
+
+        deployment = crud.get_deployment(
+            db=db,
+            deployment_id=deployment_id,
+        )
+
+        if not deployment:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Deployment not found.",
+            )
+
+        return deployment
+
+    # ----------------------------------------
+    # Deployment History
+    # ----------------------------------------
+
+    def get_project_deployments(
+        self,
+        db: Session,
+        project_id: int,
+    ):
+
+        return {
+            "deployments": crud.get_project_deployments(
+                db=db,
+                project_id=project_id,
+            )
+        }
+
+    # ----------------------------------------
+    # Deployment Logs
+    # ----------------------------------------
+
+    def get_logs(
+        self,
+        db: Session,
+        deployment_id: int,
+    ):
+
+        deployment = crud.get_deployment(
+            db=db,
+            deployment_id=deployment_id,
+        )
+
+        if not deployment:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Deployment not found.",
+            )
+
+        return {
+            "deployment_id": deployment.id,
+            "logs": deployment.logs,
+        }
+
 
 deployment_service = DeploymentService()
