@@ -17,6 +17,8 @@ from app.project_assignments.router import router as project_assignment_router
 from app.ai_chat.router import router as ai_chat_router
 from app.ai_modifier.router import  router as ai_modifier_router
 from app.deployment.router import  router as deployment_router
+from app.project_folders import models as project_folder_models
+from app.project_folders.router import router as project_folders_router
 
 
 
@@ -148,6 +150,7 @@ app.include_router(ai_generator_router, prefix="/api/ai-generator", tags=["AI Ge
 app.include_router(connectors_router, prefix="/api/connectors",tags=["connectors"])
 app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
 app.include_router(project_files_router, prefix="/api/project-files", tags=["Project Files"])
+app.include_router(project_folders_router, prefix="/api/project-folders", tags=["Project Folders"])
 app.include_router(project_assignment_router, prefix="/api/project-assignments", tags=["Project Assignments"])
 app.include_router(ai_chat_router, prefix="/api/ai-chat", tags=["AI Chat"],)
 app.include_router( ai_modifier_router, prefix="/api/ai-modifier", tags=["AI Modifier"],)

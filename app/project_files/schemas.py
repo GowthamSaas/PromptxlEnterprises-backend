@@ -39,6 +39,10 @@ class RenameFileRequest(BaseModel):
     )
 
 
+class MoveFileRequest(BaseModel):
+    destination_path: str = ""
+
+
 class CreateFileRequest(BaseModel):
     project_id: int
     file_name: str

@@ -20,6 +20,9 @@ from app.project_files.services.file_delete_service import (
 from app.project_files.services.file_rename_service import (
     file_rename_service,
 )
+from app.project_files.services.file_move_service import (
+    file_move_service,
+)
 from app.project_files.validators import (
     ProjectFileValidator,
 )
@@ -122,6 +125,18 @@ class ProjectFileService:
             db=db,
             file_id=file_id,
             new_file_name=new_file_name,
+        )
+
+    @staticmethod
+    def move_project_file(
+        db: Session,
+        file_id: int,
+        destination_path: str,
+    ):
+        return file_move_service.move_file(
+            db=db,
+            file_id=file_id,
+            destination_path=destination_path,
         )
 
     @staticmethod
