@@ -56,6 +56,12 @@ class DeploymentResponse(BaseModel):
 
     message: str
 
+    # New fields for project type detection
+    application_type: Optional[str] = None  # "frontend_only" or "full_stack"
+
+    # Safe Supabase info (no secrets)
+    supabase_project: Optional[Dict[str, Any]] = None
+
     class Config:
         from_attributes = True
 
