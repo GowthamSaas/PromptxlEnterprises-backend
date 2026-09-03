@@ -61,7 +61,21 @@ class DeploymentValidationService:
                 detail="Project not found.",
             )
 
-        if project.tenant_id != tenant_id:
+        # Get project owner and validate tenant through user relationship
+        project_user = (
+            db.query(User)
+            .filter(User.id == project.user_id)
+            .first()
+        )
+
+        if not project_user:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Project owner not found.",
+            )
+
+        if project_user.tenant_id != tenant_id:
 
             raise HTTPException(
                 status_code=403,
@@ -116,5 +130,34 @@ class DeploymentValidationService:
                 detail="Invalid deployment method.",
             )
 
+    # --------------------------------------------------
+    # Validate Full-Stack Requirements
+    # --------------------------------------------------
+
+    def validate_full_stack_deployment(
+        self,
+        db: Session,
+        *,
+        tenant_id: int,
+        requires_supabase: bool,
+    ):
+        """
+        Validate that Supabase is properly configured for full-stack deployments.
+        """
+        if requires_supabase:
+            connected = connector_crud.is_connected(
+                db=db,
+                tenant_id=tenant_id,
+                provider=ConnectorProvider.SUPABASE,
+            )
+
+            if not connected:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "This project requires Supabase for deployment, "
+                        "but no Supabase connector is configured."
+                    ),
+                )
 
 deployment_validation_service = DeploymentValidationService()

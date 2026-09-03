@@ -97,6 +97,11 @@ class Tenant(Base):
         back_populates="tenant",
         cascade="all, delete-orphan"
     )
+    ai_agent_connections = relationship(
+        "AIAgentConnection",
+        back_populates="tenant",
+        cascade="all, delete-orphan"
+    )
     deployments = relationship(
        "Deployment",
        back_populates="tenant",

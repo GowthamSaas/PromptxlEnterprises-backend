@@ -19,7 +19,7 @@ from app.ai_modifier.router import  router as ai_modifier_router
 from app.deployment.router import  router as deployment_router
 from app.project_folders import models as project_folder_models
 from app.project_folders.router import router as project_folders_router
-
+from app.ai_agent.router import router as ai_agent_router
 
 
 
@@ -155,7 +155,7 @@ app.include_router(project_assignment_router, prefix="/api/project-assignments",
 app.include_router(ai_chat_router, prefix="/api/ai-chat", tags=["AI Chat"],)
 app.include_router( ai_modifier_router, prefix="/api/ai-modifier", tags=["AI Modifier"],)
 app.include_router( deployment_router, prefix="/api/deployment", tags=["Deployment"],)
-
+app.include_router( ai_agent_router, prefix="/api/ai-agent", tags=["AI Agent"],)
 @app.get("/")
 def root():
     return {"message": "PromptXL Enterprise API", "version": "1.0.0"}

@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ENCRYPTION_KEY: str
+    AI_AGENT_ENCRYPTION_KEY: str
     # App
     APP_NAME: str = "PromptXL Enterprise"
     DEBUG: bool = True

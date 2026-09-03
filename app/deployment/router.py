@@ -48,6 +48,10 @@ async def deploy_project(
             request=request,
         )
 
+    except HTTPException:
+        # Re-raise HTTPException to preserve status code
+        raise
+
     except Exception as exc:
 
         raise HTTPException(

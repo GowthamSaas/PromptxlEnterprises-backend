@@ -116,6 +116,12 @@ class User(Base):
     foreign_keys="LLMProvider.connected_by",
 )
 
+    ai_agent_connections = relationship(
+        "AIAgentConnection",
+        back_populates="connected_user",
+        foreign_keys="AIAgentConnection.connected_by",
+    )
+
     created_connectors = relationship(
     "Connector",
     back_populates="creator",
